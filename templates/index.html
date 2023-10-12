@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot Demo</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body>
+    <div class="chatbox">
+        <div class="chatlogs">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Type a message..." />
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatlogs = document.querySelector('.chatlogs');
+        const userMessageInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = userMessageInput.value.trim();
+            if (userMessage === '') return;
+
+            // Display user message
+            displayMessage('user', userMessage);
+
+            // You can add your chatbot logic here to generate responses
+
+            // Clear the input field
+            userMessageInput.value = '';
+        });
+
+        function displayMessage(sender, message) {
+            const chat = document.createElement('div');
+            chat.classList.add('chat');
+            const avatar = document.createElement('div');
+            avatar.classList.add(`${sender}-avatar`);
+            avatar.innerText = sender === 'user' ? 'You' : 'Bot';
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('message');
+            messageBox.classList.add(`${sender}-message`);
+            messageBox.innerText = message;
+            chat.appendChild(avatar);
+            chat.appendChild(messageBox);
+            chatlogs.appendChild(chat);
+            chatlogs.scrollTop = chatlogs.scrollHeight; // Scroll to the latest message
+        }
+    </script>
+</body>
+</html>
