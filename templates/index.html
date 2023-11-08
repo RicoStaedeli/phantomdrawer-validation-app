@@ -1,53 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chatbot Demo</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #imageGrid {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 5px;
+      padding: 10px;
+    }
+
+    .image {
+      width: 250px;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    #bottomSection {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #checkmark {
+      display: none;
+    }
+
+    #selectableImage {
+      max-width: 100%;
+      max-height: 100%;
+      cursor: pointer;
+    }
+
+    #selectableImage:checked + label {
+      display: block;
+    }
+
+    label {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="chatbox">
-        <div class="chatlogs">
-            <!-- Chat messages will be appended here -->
-        </div>
-        <div class="input-box">
-            <input type="text" id="user-input" placeholder="Type a message..." />
-            <button id="send-button">Send</button>
-        </div>
-    </div>
+  <div id="imageGrid">
+    <!-- Fill in the 9x9 grid of images with specific URLs -->
+    <!-- Use a specific folder path format for the first image -->
+    <img class="image" src="static/images/image1.jpg" alt="Image 1">
+    <img class="image" src="static/images/image2.jpg" alt="Image 2">
+    <img class="image" src="static/images/image3.jpg" alt="Image 3">
+    <img class="image" src="static/images/image4.jpg" alt="Image 4">
+    <img class="image" src="static/images/image5.jpg" alt="Image 5">
+    <img class="image" src="static/images/image6.jpg" alt="Image 6">
+    <img class="image" src="static/images/image7.jpg" alt="Image 7">
+    <img class="image" src="static/images/image8.jpg" alt="Image 8">
+    <img class="image" src="static/images/image9.jpg" alt="Image 9">
+  </div>
 
-    <script>
-        const chatlogs = document.querySelector('.chatlogs');
-        const userMessageInput = document.getElementById('user-input');
-        const sendButton = document.getElementById('send-button');
-
-        sendButton.addEventListener('click', () => {
-            const userMessage = userMessageInput.value.trim();
-            if (userMessage === '') return;
-
-            // Display user message
-            displayMessage('user', userMessage);
-
-            // You can add your chatbot logic here to generate responses
-
-            // Clear the input field
-            userMessageInput.value = '';
-        });
-
-        function displayMessage(sender, message) {
-            const chat = document.createElement('div');
-            chat.classList.add('chat');
-            const avatar = document.createElement('div');
-            avatar.classList.add(`${sender}-avatar`);
-            avatar.innerText = sender === 'user' ? 'You' : 'Bot';
-            const messageBox = document.createElement('div');
-            messageBox.classList.add('message');
-            messageBox.classList.add(`${sender}-message`);
-            messageBox.innerText = message;
-            chat.appendChild(avatar);
-            chat.appendChild(messageBox);
-            chatlogs.appendChild(chat);
-            chatlogs.scrollTop = chatlogs.scrollHeight; // Scroll to the latest message
-        }
-    </script>
+  <div id="bottomSection">
+    <input type="checkbox" id="selectableImage">
+    <label for="selectableImage">&#10003;</label>
+    <img class="image" src="static/images/selectable_image.jpg" alt="Selectable Image">
+    <!-- Replace "selectable_image.jpg" with your selectable image URL -->
+  </div>
 </body>
 </html>
