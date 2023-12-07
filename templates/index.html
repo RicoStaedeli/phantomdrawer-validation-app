@@ -1,83 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    #imageGrid {
-      flex: 2;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-gap: 5px;
-      padding: 10px;
-    }
-
-    .image {
-      width: 250px;
-      height: 150px;
-      object-fit: cover;
-    }
-
-    #bottomSection {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #checkmark {
-      display: none;
-    }
-
-    #selectableImage {
-      max-width: 100%;
-      max-height: 100%;
-      cursor: pointer;
-    }
-
-    #selectableImage:checked + label {
-      display: block;
-    }
-
-    label {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: white;
-      border: 1px solid #ccc;
-      padding: 5px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clickable Boxes</title>
+    <style>
+        .box {
+            display: inline-block;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <div id="imageGrid">
-    <!-- Fill in the 9x9 grid of images with specific URLs -->
-    <!-- Use a specific folder path format for the first image -->
-    <img class="image" src="static/images/image1.jpg" alt="Image 1">
-    <img class="image" src="static/images/image2.jpg" alt="Image 2">
-    <img class="image" src="static/images/image3.jpg" alt="Image 3">
-    <img class="image" src="static/images/image4.jpg" alt="Image 4">
-    <img class="image" src="static/images/image5.jpg" alt="Image 5">
-    <img class="image" src="static/images/image6.jpg" alt="Image 6">
-    <img class="image" src="static/images/image7.jpg" alt="Image 7">
-    <img class="image" src="static/images/image8.jpg" alt="Image 8">
-    <img class="image" src="static/images/image9.jpg" alt="Image 9">
-  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded",
+  function() {
+    // Make an AJAX call to /baseIds
+    // Make a GET request to the Flask endpoint
+    axios.get('/baseIds').then(response =>{
+      // Parse the response as JSON
+      var baseIds = response.data.images;
 
-  <div id="bottomSection">
-    <input type="checkbox" id="selectableImage">
-    <label for="selectableImage">&#10003;</label>
-    <img class="image" src="static/images/selectable_image.jpg" alt="Selectable Image">
-    <!-- Replace "selectable_image.jpg" with your selectable image URL -->
-  </div>
+      for (var i = 0; i < baseIds.length; i++) {
+        var number = baseIds[i];
+
+        // Create a box element
+        var box = document.createElement("div");
+        box.className = "box";
+        box.textContent = number;
+
+        // Attach a click event to the box with a closure
+        box.addEventListener("click", (function(clickedNumber) {
+          return function() {
+            // Redirect to /Validate with the clicked number as a parameter
+            window.location.href = "/Validate?number=" + encodeURIComponent(clickedNumber);
+          };
+        })(number));
+
+        // Append the box to the body
+        document.body.appendChild(box);
+      }
+    }).
+    catch(error =>{
+      console.error('Error fetching images:', error);
+    });
+  });
+</script>
+
 </body>
 </html>

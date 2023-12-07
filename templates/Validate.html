@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #imageGrid {
+      flex: 2;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 5px;
+      padding: 10px;
+    }
+
+    .image {
+      width: 250px;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    #bottomSection {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #checkmark {
+      display: none;
+    }
+
+    #selectableImage {
+      max-width: 100%;
+      max-height: 100%;
+      cursor: pointer;
+    }
+
+    #selectableImage:checked + label {
+      display: block;
+    }
+
+    label {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+    }
+
+    input {
+      width: 10px!important;
+      height: 10px!important;
+    }
+    .selected-image {
+      border: 5px solid blue;
+    }
+
+    .centered-image-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 10vh; /* Adjust as needed */
+      }
+    </style>
+  </style>
+ <!-- Bootstrap CSS -->
+ <link href=
+ "https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+         rel="stylesheet" integrity=
+ "sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU"
+         crossorigin="anonymous" />
+ </head>
+<body>
+  <div class="container mt-5">
+    <div class="row">
+      <div id="image-container">
+        <!-- Images will be displayed here -->
+      </div>
+      <div class="col-sm-4' 'mb-3"> 
+        <div id="baseimage"></div>
+        <button type="button" id="Selection" class="btn btn-primary mx-auto text-center">Primary</button></div>
+    </div>
+  </div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+  <script src=
+  "https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
+          integrity=
+  "sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
+          crossorigin="anonymous">
+      </script>
+     
+
+
+<script>
+  document.getElementById('Selection').addEventListener('click', function() {
+    const selectedImages = document.querySelectorAll('.selected-image');
+    var altText='';
+
+    // Attach a click event listener to each selected image
+    selectedImages.forEach(function(image) {
+            // Get the alt text of the clicked image
+            altText = image.getAttribute('alt');
+
+            // Display the alt text in the console (you can modify this part based on your requirements)
+            console.log('Alt Text:', altText);
+    });
+
+
+      // Make an HTTP POST request to the Flask route
+      fetch('/trigger_route', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+              // Add any other headers if needed
+          },
+          // You can include data in the body if your route expects it
+          body: JSON.stringify({ key: altText })
+      })
+      .then(response => response.text())
+      .then(data => {
+          console.log(data); // Log the response from the Flask route
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  });
+
+
+
+  </script>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+   // Get the query string part of the URL
+   var queryString = window.location.search;
+
+    // Create a URLSearchParams object from the query string
+    var urlParams = new URLSearchParams(queryString);
+
+    // Get the value of the 'number' parameter
+    var numberParam = urlParams.get('number');
+    // Make a GET request to the Flask endpoint
+    axios.get('/get_images?number=' + numberParam)
+      .then(response => {
+        // Access the images array from the response data
+        const images = response.data.images;
+
+        // Replace the images on the page with the base64 codes
+        const imageContainer = document.getElementById('image-container');
+        images.forEach(base64 => {
+            const img = document.createElement('img');
+            const div = document.createElement('div');
+            div.classList.add('col-sm-4','mb-3')
+            img.src = `data:image/png;base64,${base64}`;
+            img.alt = 'Base64 Image';
+            img.classList.add('image','img-fluid');
+            img.addEventListener('click', handleImageClick);  // Attach click event listener
+            div.style.display = 'inline-block';
+            div.appendChild(img);
+
+            imageContainer.appendChild(div);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching images:', error);
+      });
+
+      function handleImageClick() {
+        // Remove border from all images
+        document.querySelectorAll('.image').forEach(function(img) {
+            img.classList.remove('selected-image');
+        });
+
+        // Add border to the clicked image only if it doesn't have it
+        if (!this.classList.contains('selected-image')) {
+            this.classList.add('selected-image');
+        }
+    }
+</script>
+
+<script>
+  // Get the query string part of the URL
+  var queryString = window.location.search;
+
+   // Create a URLSearchParams object from the query string
+   var urlParams = new URLSearchParams(queryString);
+
+   // Get the value of the 'number' parameter
+   var numberParam = urlParams.get('number');
+   // Make a GET request to the Flask endpoint
+   axios.get('/baseImage?number=' + numberParam)
+     .then(response => {
+       // Access the images array from the response data
+       const images = response.data.images;
+
+       // Replace the images on the page with the base64 codes
+       const imageContainer = document.getElementById('baseimage');
+
+           const img = document.createElement('img');
+           const div = document.createElement('div');
+           div.classList.add('col-sm-4','mb-3')
+           img.src = `data:image/png;base64,${images}`;
+           img.alt = 'Base64 Image';
+           img.classList.add('image','img-fluid');
+           img.addEventListener('click', handleImageClick);  // Attach click event listener
+           div.style.display = 'inline-block';
+           div.appendChild(img);
+
+           imageContainer.appendChild(div);
+
+     })
+     .catch(error => {
+       console.error('Error fetching image:', error);
+     });
+</script>
+  
+</body>
+</html>
