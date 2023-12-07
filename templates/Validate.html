@@ -167,7 +167,7 @@
             const div = document.createElement('div');
             div.classList.add('col-sm-4','mb-3')
             img.src = `data:image/png;base64,${base64}`;
-            img.alt = 'Base64 Image';
+            img.alt = base64.slice(0,10);
             img.classList.add('image','img-fluid');
             img.addEventListener('click', handleImageClick);  // Attach click event listener
             div.style.display = 'inline-block';
@@ -215,9 +215,8 @@
            const div = document.createElement('div');
            div.classList.add('col-sm-4','mb-3')
            img.src = `data:image/png;base64,${images}`;
-           img.alt = 'Base64 Image';
+           img.alt = images.slice(0,10);
            img.classList.add('image','img-fluid');
-           img.addEventListener('click', handleImageClick);  // Attach click event listener
            div.style.display = 'inline-block';
            div.appendChild(img);
 
