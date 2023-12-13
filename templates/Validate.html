@@ -108,6 +108,7 @@
   document.getElementById('Selection').addEventListener('click', function() {
     const selectedImages = document.querySelectorAll('.selected-image');
     var altText='';
+    var basealttext = document.getElementById('baseimg').getAttribute('alt');
 
     // Attach a click event listener to each selected image
     selectedImages.forEach(function(image) {
@@ -127,7 +128,7 @@
               // Add any other headers if needed
           },
           // You can include data in the body if your route expects it
-          body: JSON.stringify({ key: altText })
+          body: JSON.stringify({ key: altText +"_"+ basealttext })
       })
       .then(response => response.text())
       .then(data => {
@@ -167,7 +168,7 @@
             const div = document.createElement('div');
             div.classList.add('col-sm-4','mb-3')
             img.src = `data:image/png;base64,${base64}`;
-            img.alt = base64.slice(0,10);
+            img.alt = base64.slice(-10);
             img.classList.add('image','img-fluid');
             img.addEventListener('click', handleImageClick);  // Attach click event listener
             div.style.display = 'inline-block';
@@ -214,6 +215,7 @@
            const img = document.createElement('img');
            const div = document.createElement('div');
            div.classList.add('col-sm-4','mb-3')
+           img.id='baseimg';
            img.src = `data:image/png;base64,${images}`;
            img.alt = images.slice(0,10);
            img.classList.add('image','img-fluid');
