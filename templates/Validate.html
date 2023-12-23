@@ -88,7 +88,10 @@
       </div>
       <div class="col-sm-4' 'mb-3"> 
         <div id="baseimage"></div>
-        <button type="button" id="Selection" class="btn btn-primary mx-auto text-center">Primary</button></div>
+        <button type="button" id="Selection" class="btn btn-primary mx-auto text-center">submit</button>
+        <button type="button" id="end" class="btn btn-secondary mx-auto text-center">end test</button>
+      
+      </div>
     </div>
   </div>
 
@@ -109,6 +112,14 @@
     const selectedImages = document.querySelectorAll('.selected-image');
     var altText='';
     var basealttext = document.getElementById('baseimg').getAttribute('alt');
+    var queryString = window.location.search;
+
+    // Create a URLSearchParams object from the query string
+    var urlParams = new URLSearchParams(queryString);
+
+    // Get the value of the 'number' parameter
+    var numberParam = urlParams.get('number');
+    var nameParam = urlParams.get('user');
 
     // Attach a click event listener to each selected image
     selectedImages.forEach(function(image) {
@@ -128,7 +139,7 @@
               // Add any other headers if needed
           },
           // You can include data in the body if your route expects it
-          body: JSON.stringify({ key: altText +"_"+ basealttext })
+          body: JSON.stringify({ key: altText , user : nameParam , number : numberParam })
       })
       .then(response => response.text())
       .then(data => {
@@ -137,6 +148,7 @@
       .catch(error => {
           console.error('Error:', error);
       });
+      window.location = '/Imageset?user='+nameParam;
   });
 
 
@@ -167,8 +179,8 @@
             const img = document.createElement('img');
             const div = document.createElement('div');
             div.classList.add('col-sm-4','mb-3')
-            img.src = `data:image/png;base64,${base64}`;
-            img.alt = base64.slice(-10);
+            img.src = `data:image/png;base64,${base64[1]}`;
+            img.alt = base64[0];
             img.classList.add('image','img-fluid');
             img.addEventListener('click', handleImageClick);  // Attach click event listener
             div.style.display = 'inline-block';
@@ -217,7 +229,7 @@
            div.classList.add('col-sm-4','mb-3')
            img.id='baseimg';
            img.src = `data:image/png;base64,${images}`;
-           img.alt = images.slice(0,10);
+           img.alt = images.slice(-10);
            img.classList.add('image','img-fluid');
            div.style.display = 'inline-block';
            div.appendChild(img);
@@ -228,6 +240,12 @@
      .catch(error => {
        console.error('Error fetching image:', error);
      });
+
+    // Add a click event handler to the button
+    $('#end').on('click', function() {
+    // Redirect to "/"
+    window.location.href = "/";
+  });
 </script>
   
 </body>

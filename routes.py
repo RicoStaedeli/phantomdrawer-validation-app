@@ -3,7 +3,8 @@ import requests
 import base64
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, DECIMAL
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, DECIMAL, BigInteger
+from sqlalchemy.orm.exc import NoResultFound
 
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
@@ -11,7 +12,6 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from functions import Functions
 import os
 from flask import Flask
-from flask_mysqldb import MySQL
 
 
 app = Flask(__name__)
@@ -25,32 +25,38 @@ db = SQLAlchemy(app)
 
 app.app_context().push()
 
+
 class User(db.Model):
     __tablename__ = 'User'
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(255), nullable=False)
+    username = Column(String(255), nullable=False, unique=True)  # Ensure unique usernames
     tests = relationship('Test', back_populates='user')
 
-class ImageSet(db.Model):
-    __tablename__ = 'ImageSet'
-
-    imageset_id = Column(Integer, primary_key=True, autoincrement=True)
-    imageset_name = Column(String(255), nullable=False)
-    tests = relationship('Test', back_populates='imageset')
+    @classmethod
+    def create_user(cls, session, username):
+        try:
+            # Try to get a user with the given username
+            existing_user = session.query(cls).filter(cls.username == username).one()
+            return existing_user  # User with the same username already exists
+        except NoResultFound:
+            # If no user with the given username is found, create a new user
+            new_user = cls(username=username)
+            session.add(new_user)
+            return new_user
 
 class Test(db.Model):
     __tablename__ = 'Test'
 
-    test_id = Column(Integer, primary_key=True, autoincrement=True)
+    imageset_id = Column(Integer, primary_key=True, autoincrement=True)
+    image_id = Column(BigInteger)  # Use BigInteger for non-countable integers
     time = Column(DateTime, nullable=False)
-    highscore_percentage = Column(DECIMAL(5,2), nullable=False)
-    
     user_id = Column(Integer, ForeignKey('User.user_id'))
-    user = relationship('User', back_populates='tests')
 
-    imageset_id = Column(Integer, ForeignKey('ImageSet.imageset_id'))
-    imageset = relationship('ImageSet', back_populates='tests')
+
+
+with app.app_context():
+    db.create_all()
 	
 
 
@@ -59,7 +65,18 @@ class Test(db.Model):
 @app.route('/')
 @app.route('/Index')
 def Index():
-    return render_template('index.html', the_title='Phantomzeichner')
+    return render_template('Index.html', the_title='Phantomzeichner')
+
+
+
+
+
+# two decorators, same function
+@app.route('/Imageset', methods=['GET'])
+def Imageset():
+    return render_template('Imageset.html', the_title='Phantomzeichner')
+
+
 
 @app.route('/get_images', methods=['GET'])
 def get_images():
@@ -96,28 +113,21 @@ def trigger_route():
 
     # Access the value using the key
     key_value = data.get('key')
+    name_value = data.get('user')
+    number_value = data.get('number')
 
     Session = sessionmaker(bind=db.engine)
     session = Session()
     # Insert a new User
-    new_user = User(username='JohnDoe')
+    new_user = new_user = User.create_user(session, name_value)
     session.add(new_user)
     session.commit()
 
     # Insert a new ImageSet
-    new_imageset = ImageSet(imageset_name=key_value)
+    new_imageset = Test(selected_image=key_value, image_id=number_value, time=datetime.now(), user=new_user)
     session.add(new_imageset)
     session.commit()
 
-    # Insert a new Test associated with the User and ImageSet
-    new_test = Test(
-        time=datetime.now(),
-        highscore_percentage=90.5,
-        user=new_user,
-        imageset=new_imageset
-    )
-    session.add(new_test)
-    session.commit()
 
     return "Route triggered successfully!"
 

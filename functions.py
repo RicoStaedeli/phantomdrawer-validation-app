@@ -3,19 +3,20 @@ import requests
 class Functions:
 
     @staticmethod
-    def get_images_by_agent_id(id):
-        # Create a list
+    def get_images_by_agent_id(agent_id):
+        # Create a list of lists to store image path and base64 data
         image_list = []
-        agent_id = ""
-        api_url = f"http://127.0.0.1:8000/imagesbyagentid/{id}"
+        api_url = f"http://127.0.0.1:8000/imagesbyagentid/{agent_id}"
+        
         try:
             response = requests.get(api_url)
             response.raise_for_status()  # Raise an error for bad responses (4xx or 5xx)
             json_data = response.json()
+
             for data in json_data:
-                if 'base64_Image' in data:
-                    # Add the base64 image to the list
-                    image_list.append(data['base64_Image'])
+                if 'base64_Image' in data and 'path' in data:
+                    # Add a list with path and base64 image to the image_list
+                    image_list.append([data['path'], data['base64_Image']])
 
         except requests.exceptions.HTTPError as http_err:
             print(f"HTTP error occurred: {http_err}")
@@ -23,7 +24,7 @@ class Functions:
             print(f"Request error occurred: {req_err}")
 
         return image_list
-
+    
     @staticmethod
     def get_images_by_base_id(id):
         agent_id = ""

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clickable Boxes</title>
+    <style>
+        .box {
+            display: inline-block;
+            margin: 10px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded",
+  function() {
+    // Make an AJAX call to /baseIds
+    // Make a GET request to the Flask endpoint
+    axios.get('/baseIds').then(response =>{
+      // Parse the response as JSON
+      var baseIds = response.data.images;
+
+      for (var i = 0; i < baseIds.length; i++) {
+        var number = baseIds[i];
+
+        // Create a box element
+        var box = document.createElement("div");
+        box.className = "box";
+        box.textContent = number;
+
+        // Attach a click event to the box with a closure
+        box.addEventListener("click", (function(clickedNumber) {
+          return function() {
+            // Get the query string part of the URL
+            var queryString = window.location.search;
+
+            // Create a URLSearchParams object from the query string
+            var urlParams = new URLSearchParams(queryString);
+            var nameParam = urlParams.get('user');
+            // Redirect to /Validate with the clicked number as a parameter
+            window.location.href = "/Validate?user=" + encodeURIComponent(nameParam) + "&number=" + encodeURIComponent(clickedNumber);
+          };
+        })(number));
+
+        // Append the box to the body
+        document.body.appendChild(box);
+      }
+    }).
+    catch(error =>{
+      console.error('Error fetching images:', error);
+    });
+  });
+</script>
+
+</body>
+</html>

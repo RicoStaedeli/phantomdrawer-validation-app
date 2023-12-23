@@ -4,53 +4,35 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clickable Boxes</title>
+    <title>Textbox and Button</title>
     <style>
-        .box {
-            display: inline-block;
-            margin: 10px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            cursor: pointer;
+        #container {
+            text-align: center;
+            margin-top: 50px;
         }
     </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded",
-  function() {
-    // Make an AJAX call to /baseIds
-    // Make a GET request to the Flask endpoint
-    axios.get('/baseIds').then(response =>{
-      // Parse the response as JSON
-      var baseIds = response.data.images;
+    <div id="container">
+        <label for="imageInput">Enter Username:</label>
+        <input type="text" id="imageInput" placeholder="Type Username here">
+        <button onclick="redirectToImageset()">now choose Imageset</button>
+    </div>
 
-      for (var i = 0; i < baseIds.length; i++) {
-        var number = baseIds[i];
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function redirectToImageset() {
+            var imageId = document.getElementById("imageInput").value;
 
-        // Create a box element
-        var box = document.createElement("div");
-        box.className = "box";
-        box.textContent = number;
-
-        // Attach a click event to the box with a closure
-        box.addEventListener("click", (function(clickedNumber) {
-          return function() {
-            // Redirect to /Validate with the clicked number as a parameter
-            window.location.href = "/Validate?number=" + encodeURIComponent(clickedNumber);
-          };
-        })(number));
-
-        // Append the box to the body
-        document.body.appendChild(box);
-      }
-    }).
-    catch(error =>{
-      console.error('Error fetching images:', error);
-    });
-  });
-</script>
-
+            // Check if the input is not empty before redirecting
+            if (imageId.trim() !== "") {
+                // Redirect to /Imageset with the entered image ID as a parameter
+                window.location.href = "/Imageset?user=" + encodeURIComponent(imageId);
+            } else {
+                // Display an alert or take appropriate action when the input is empty
+                alert("Please enter a username before choosing Imageset.");
+            }
+        }
+    </script>
 </body>
 </html>
